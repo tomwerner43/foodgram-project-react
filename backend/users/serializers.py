@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from recipes.models import Recipe
+from book.models import Recipe
 
 from .models import Subscribe
 

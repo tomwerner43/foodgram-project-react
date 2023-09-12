@@ -6,7 +6,7 @@ from .models import Subscribe, User
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     """
-    Класс модели Users
+    Класс модели Users.
     """
 
     list_display = (
@@ -25,7 +25,7 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Subscribe)
 class SubscribeAdmin(admin.ModelAdmin):
     """
-    Класс модели SubscrideAdmin
+    Класс модели SubscrideAdmin.
     """
 
     list_display = (
