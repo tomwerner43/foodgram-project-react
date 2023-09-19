@@ -10,6 +10,9 @@ from .serializers import SubscribeSerializer
 
 
 class SubscriptionsViewSet(viewsets.ModelViewSet):
+    """
+    Используется для отображения и управления подписками пользователя.
+    """
 
     serializer_class = SubscribeSerializer
     permission_classes = (IsAuthenticated, )
@@ -22,6 +25,9 @@ class SubscriptionsViewSet(viewsets.ModelViewSet):
 
 
 class SubscribeAddDelView(APIView):
+    """
+    Используется для добавления и удаления подписок на других пользователей.
+    """
 
     permission_classes = (IsAuthenticated, )
     http_method_names = ('post', 'delete', )

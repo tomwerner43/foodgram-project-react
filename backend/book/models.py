@@ -5,6 +5,10 @@ from users.models import User
 
 
 class Tag(models.Model):
+    """
+    Класс представляет теги, которые могут быть привязаны к рецептам.
+    """
+
     name = models.CharField(
         max_length=255,
         unique=True,
@@ -39,6 +43,10 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
+    """
+    Класс представляет ингредиенты, используемые в рецептах.
+    """
+
     name = models.CharField(
         verbose_name='Название',
         max_length=200,
@@ -64,6 +72,10 @@ class Ingredient(models.Model):
 
 
 class Recipe(models.Model):
+    """
+    Класс представляет рецепты блюд.
+    """
+
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
         related_name='recipe',
@@ -114,6 +126,11 @@ class Recipe(models.Model):
 
 
 class IngredientForRecipe(models.Model):
+    """
+    Класс представляет отношение между ингредиентами
+    и рецептами, указывая количество ингредиентов в каждом рецепте.
+    """
+
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -144,6 +161,11 @@ class IngredientForRecipe(models.Model):
 
 
 class Favorite(models.Model):
+    """
+    Класс представляет отношение между пользователями
+    и рецептами, которые они добавили в избранное.
+    """
+
     recipe = models.ForeignKey(
         Recipe,
         related_name='in_favorite',
@@ -173,6 +195,11 @@ class Favorite(models.Model):
 
 
 class Cart(models.Model):
+    """
+    Класс представляет отношение между пользователями
+    и рецептами, которые они добавили в список покупок.
+    """
+
     cart_owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

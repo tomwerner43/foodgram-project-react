@@ -4,6 +4,10 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """
+    Класс представляет пользователей приложения.
+    """
+
     email = models.EmailField(
         max_length=254,
         unique=True,
@@ -51,6 +55,11 @@ class User(AbstractUser):
 
 
 class Subscribe(models.Model):
+    """
+    Класс представляет отношение между пользователями,
+    где одни пользователи могут подписываться на других.
+    """
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

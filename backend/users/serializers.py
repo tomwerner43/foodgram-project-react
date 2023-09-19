@@ -6,6 +6,9 @@ from .models import Subscribe
 
 
 class RecipeShortListSerializer(serializers.ModelSerializer):
+    """
+    Сериализует ограниченное количество полей из модели Recipe.
+    """
 
     class Meta:
         model = Recipe
@@ -19,6 +22,11 @@ class RecipeShortListSerializer(serializers.ModelSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
+    """
+    Сериализует информацию о подписке пользователя на других пользователей,
+    включая информацию о пользователе, на которого подписались,
+    статус подписки, список его рецептов и их количество.
+    """
     email = serializers.ReadOnlyField(source='author.email')
     id = serializers.ReadOnlyField(source='author.id')
     username = serializers.ReadOnlyField(source='author.username')
