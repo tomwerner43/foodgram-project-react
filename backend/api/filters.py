@@ -1,6 +1,5 @@
 from django_filters import rest_framework as filters
 from rest_framework.exceptions import AuthenticationFailed
-
 from book.models import Recipe, Tag
 
 

@@ -13,7 +13,6 @@ from book.models import (
 )
 from users.models import User
 from users.serializers import RecipeShortListSerializer
-
 from .mixins import ReadOnlyMixin
 
 
