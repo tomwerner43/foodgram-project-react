@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Subscribe, User
+from .models import Follow, User
 
 
 @admin.register(User)
@@ -9,30 +9,15 @@ class UserAdmin(admin.ModelAdmin):
     Класс модели Users.
     """
 
-    list_display = (
-        'id',
-        'username',
-        'email',
-        'first_name',
-        'last_name',
-    )
-    list_filter = ('username', 'email', 'is_superuser',)
-    list_display_links = ('email',)
-    search_fields = ('username', 'email',)
-    empty_value_display = 'пусто'
+    search_fields = ('email', 'first_name')
+    list_filter = ('email', 'first_name')
+    empty_value_display = '-пусто-'
 
 
-@admin.register(Subscribe)
-class SubscribeAdmin(admin.ModelAdmin):
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
     """
-    Класс модели SubscrideAdmin.
+    Класс модели Follow.
     """
 
-    list_display = (
-        'id',
-        'user',
-        'author',
-    )
-    list_filter = ('user', 'author',)
-    search_fields = ('user__username', 'author__username',)
-    empty_value_display = 'пусто'
+    empty_value_display = '-пусто-'
