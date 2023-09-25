@@ -1,5 +1,5 @@
-from core.filters import RecipeFilter
-from core.pagination import CustomPagination
+from .filters import RecipeFilter
+from .pagination import CustomPagination
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
