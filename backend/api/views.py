@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from recipes.models import (Cart,
                             Favorite,
-                            IngredientForRecipe,
                             Ingredient,
                             Recipe,
                             Tag
