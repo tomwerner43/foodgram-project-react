@@ -1,7 +1,7 @@
 import csv
 
 from django.conf import settings
-from django.core.management import BaseCommand
+from django.core.management.base import BaseCommand
 
 from recipes.models import Ingredient
 
@@ -30,5 +30,5 @@ class Command(BaseCommand):
                         f'успешно импортирован.'
                     )
                 except Exception as error:
-                    print(f'Ошибка при импорте файла {filename}. ', error)
-        self.stdout.write(self.style.SUCCESS('Импорт файлов завершен!'))
+                    print(f'Невозможно импортировать файл {filename}. ', error)
+        self.stdout.write(self.style.SUCCESS('Импорт файлов завершен'))
