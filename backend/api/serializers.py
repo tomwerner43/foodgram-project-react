@@ -247,8 +247,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     """
 
     author = CustomUserSerializer()
-    tags = TagSerializer(
-        many=True,
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True
     )
     ingredients = IngredientAmountSerializer(
         source='ingredient_in_recipe',
