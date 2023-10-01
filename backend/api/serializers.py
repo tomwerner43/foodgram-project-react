@@ -10,6 +10,7 @@ from recipes.models import (Cart,
                             Tag)
 from rest_framework import serializers
 
+import webcolors
 from users.models import Follow
 
 User = get_user_model()
@@ -177,12 +178,14 @@ class HexColorField(serializers.CharField):
     Поле для сериализации и десериализации hex-кода цвета.
     """
 
-    def to_representation(self, obj):
-        return obj
+    def to_representation(self, value):
+        return value
 
     def to_internal_value(self, data):
-        if not data.startswith("#"):
-            raise serializers.ValidationError("Недопустимый формат цвета!")
+        try:
+            data = webcolors.hex_to_name(data)
+        except ValueError:
+            raise serializers.ValidationError('Для этого цвета нет имени')
         return data
 
 
