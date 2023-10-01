@@ -172,10 +172,25 @@ class FollowToSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
+class HexColorField(serializers.CharField):
+    """
+    Поле для сериализации и десериализации hex-кода цвета.
+    """
+
+    def to_representation(self, obj):
+        return obj
+
+    def to_internal_value(self, data):
+        if not data.startswith("#"):
+            raise serializers.ValidationError("Недопустимый формат цвета!")
+        return data
+
+
 class TagSerializer(serializers.ModelSerializer):
     """
     Сериализатор тегов.
     """
+    color = HexColorField()
 
     class Meta:
         model = Tag
@@ -188,7 +203,6 @@ class TagSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id',
             'name',
-            'color',
             'slug'
         )
 
