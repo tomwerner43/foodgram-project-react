@@ -76,6 +76,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
+ADMIN_SITE_HEADER = '-пусто-'
+
+
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 

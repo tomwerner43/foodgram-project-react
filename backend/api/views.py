@@ -3,12 +3,7 @@ from .pagination import CustomPagination
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import (Cart,
-                            Favorite,
-                            Ingredient,
-                            Recipe,
-                            Tag
-                            )
+from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
 from rest_framework import filters, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
@@ -18,11 +13,18 @@ from rest_framework.validators import ValidationError
 from users.models import Follow
 
 from .permissions import AdminOrReadOnly, IsOwnerOrReadOnly
-from .serializers import (CustomUserPostSerializer, CustomUserSerializer,
-                          FollowSerializer, FollowToSerializer,
-                          IngredientSerializer, PasswordSerializer,
-                          RecipeAddSerializer, RecipePartSerializer,
-                          RecipeSerializer, TagSerializer)
+from .serializers import (
+    CustomUserPostSerializer,
+    CustomUserSerializer,
+    FollowSerializer,
+    FollowToSerializer,
+    IngredientSerializer,
+    PasswordSerializer,
+    RecipeAddSerializer,
+    RecipePartSerializer,
+    RecipeSerializer,
+    TagSerializer,
+)
 
 User = get_user_model()
 
@@ -39,13 +41,13 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
+        if self.action in ("list", "retrieve"):
             return CustomUserSerializer
         return CustomUserPostSerializer
 
     @action(
-        methods=["get"], detail=False, permission_classes=[IsAuthenticated]
-    )
+        methods=["get"],
+        detail=False, permission_classes=[IsAuthenticated])
     def me(self, request, *args, **kwargs):
         user = get_object_or_404(User, pk=request.user.id)
         serializer = CustomUserSerializer(user)
@@ -60,9 +62,8 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
             return Response({"status": "password set"})
         else:
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class FollowView(ListAPIView):
@@ -83,16 +84,16 @@ class FollowToView(views.APIView):
     """
     Используется для добавления и удаления подписок на других пользователей.
     """
+
     pagination_class = CustomPagination
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request, pk):
         author = get_object_or_404(User, pk=pk)
         user = self.request.user
-        data = {'author': author.id, 'user': user.id}
+        data = {"author": author.id, "user": user.id}
         serializer = FollowToSerializer(
-            data=data, context={'request': request}
-        )
+            data=data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
@@ -100,9 +101,7 @@ class FollowToView(views.APIView):
     def delete(self, request, pk):
         author = get_object_or_404(User, pk=pk)
         user = self.request.user
-        following = get_object_or_404(
-            Follow, user=user, author=author
-        )
+        following = get_object_or_404(Follow, user=user, author=author)
         following.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -131,7 +130,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = [CustomSearchFilter]
-    search_fields = ('^name', )
+    search_fields = ("^name",)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -146,7 +145,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
+        if self.action in ("list", "retrieve"):
             return RecipeSerializer
         return RecipeAddSerializer
 
@@ -155,36 +154,31 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=user)
 
     @action(
-        detail=True,
-        methods=('post', 'delete'),
+        detail=True, methods=("post", "delete"),
         permission_classes=(IsAuthenticated,)
     )
     def favorite(self, request, pk=None):
-        if request.method == 'POST':
+        if request.method == "POST":
             return self.add_recipe(Favorite, request, pk)
         else:
             return self.delete_recipe(Favorite, request, pk)
 
     @action(
-        detail=True,
-        methods=('post', 'delete'),
+        detail=True, methods=("post", "delete"),
         permission_classes=(IsAuthenticated,)
     )
     def shopping_cart(self, request, pk):
-        if request.method == 'POST':
+        if request.method == "POST":
             return self.add_recipe(Cart, request, pk)
         else:
             return self.delete_recipe(Cart, request, pk)
 
-    @action(
-        detail=False,
-        permission_classes=(IsAuthenticated,)
-    )
+    @action(detail=False, permission_classes=(IsAuthenticated,))
     def add_recipe(self, model, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = self.request.user
         if model.objects.filter(recipe=recipe, user=user).exists():
-            raise ValidationError('Already added.')
+            raise ValidationError("Already added.")
         model.objects.create(recipe=recipe, user=user)
         serializer = RecipePartSerializer(recipe)
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
