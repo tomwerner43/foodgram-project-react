@@ -118,6 +118,7 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AdminOrReadOnly,)
     pagination_class = None
 
+
 def updateTags(request):
     serializer = TagSerializer(data=request.data)
     if serializer.is_valid():
