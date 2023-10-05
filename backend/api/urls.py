@@ -22,7 +22,7 @@ router.register('recipes', RecipeViewSet, basename='recipes')
 urlpatterns = [
     path('users/subscriptions/', FollowView.as_view()),
     path('users/<int:pk>/subscribe/', FollowToView.as_view()),
-    path("tags/update/", updateTags.as_view()),
+    path("tags/update/", updateTags),
     path('', include(router.urls)),
     path('auth/', include('djoser.urls.authtoken')),
 ]
