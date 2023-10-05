@@ -6,7 +6,8 @@ from .views import (FollowToView,
                     IngredientViewSet,
                     RecipeViewSet,
                     TagViewSet,
-                    UserViewSet)
+                    UserViewSet,
+                    updateTags)
 
 app_name = 'api'
 
@@ -14,6 +15,7 @@ router = SimpleRouter()
 
 router.register('users', UserViewSet, basename='users')
 router.register('tags', TagViewSet, basename='tags')
+router.register("tags/update", updateTags, basename="tahs-update")
 router.register('ingredients', IngredientViewSet, basename='ingredients')
 router.register('recipes', RecipeViewSet, basename='recipes')
 

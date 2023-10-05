@@ -203,11 +203,6 @@ class TagSerializer(serializers.ModelSerializer):
             'color',
             'slug'
         )
-        read_only_fields = (
-            'id',
-            'name',
-            'slug'
-        )
 
 
 class IngredientSerializer(serializers.ModelSerializer):
