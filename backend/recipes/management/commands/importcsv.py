@@ -24,7 +24,8 @@ class Command(BaseCommand):
                 try:
                     model.objects.bulk_create(model(**data) for data in reader)
                     print(
-                        f"Файл {filename} для модели {model}" f"успешно импортирован."
+                        f"Файл {filename} для модели {model}"
+                        f"успешно импортирован."
                     )
                 except Exception as error:
                     print(f"Невозможно импортировать файл {filename}. ", error)

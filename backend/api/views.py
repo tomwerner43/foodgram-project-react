@@ -10,8 +10,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.validators import ValidationError
-from users.models import Follow
 
+from users.models import Follow
 from .permissions import AdminOrReadOnly, IsOwnerOrReadOnly
 from .serializers import (
     CustomUserPostSerializer,
