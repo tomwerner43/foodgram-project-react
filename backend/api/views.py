@@ -3,6 +3,8 @@ from .pagination import CustomPagination
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import api_view
+
 from recipes.models import (Cart,
                             Favorite,
                             Ingredient,
@@ -118,7 +120,8 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AdminOrReadOnly,)
     pagination_class = None
 
-
+ 
+@api_view(["POST"])
 def updateTags(request):
     serializer = TagSerializer(data=request.data)
     if serializer.is_valid():
