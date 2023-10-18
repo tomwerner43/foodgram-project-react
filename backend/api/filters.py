@@ -1,49 +1,41 @@
-from django_filters import rest_framework as filters
-from rest_framework.exceptions import AuthenticationFailed
-
-from recipes.models import Recipe, Tag
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import FilterSet, filters
+from recipes.models import Ingredient, Recipe, Tag
 
 User = get_user_model()
 
 
-class RecipeFilter(filters.FilterSet):
+class IngredientFilter(FilterSet):
+    name = filters.CharFilter(lookup_expr='startswith')
+
+    class Meta:
+        model = Ingredient
+        fields = ['name']
+
+
+class RecipeFilter(FilterSet):
     tags = filters.ModelMultipleChoiceFilter(
-        field_name="tags__slug",
-        to_field_name="slug",
+        field_name='tags__slug',
+        to_field_name='slug',
         queryset=Tag.objects.all(),
-        label="Выберите один тег или несколько тегов",
     )
-    is_favorited = filters.BooleanFilter(
-        method="filter_is_favorited",
-        label="В Избранном",
-    )
+
+    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = filters.BooleanFilter(
-        method="filter_is_in_shopping_cart",
-        label="В корзине",
-    )
+        method='filter_is_in_shopping_cart')
 
     class Meta:
         model = Recipe
-        fields = ("author", "tags", "is_favorited", "is_in_shopping_cart")
+        fields = ('tags', 'author',)
 
     def filter_is_favorited(self, queryset, name, value):
-        if self.request.user.is_anonymous:
-            raise AuthenticationFailed({"errors": "Вам нужно авторизоваться!"})
-        if value:
-            return queryset.filter(
-                in_favorite__recipe_subscriber=self.request.user)
+        user = self.request.user
+        if value and not user.is_anonymous:
+            return queryset.filter(favorite_recipes__user=user)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        if self.request.user.is_anonymous:
-            raise AuthenticationFailed({"errors": "Вам нужно авторизоваться!"})
-        if value:
-            return queryset.filter(shopping_cart__cart_owner=self.request.user)
+        user = self.request.user
+        if value and not user.is_anonymous:
+            return queryset.filter(shopping_cart__user=user)
         return queryset
-
-    def filter_author(self, queryset, name, value):
-        return queryset.filter(author=value)
-
-    def filter_tags(self, queryset, name, value):
-        return queryset.filter(tags__in=value)
