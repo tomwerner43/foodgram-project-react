@@ -1,92 +1,85 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group
 
-from recipes.models import (FavouriteRecipe, Ingredient, Recipe,
-                            RecipeIngredient, ShoppingCart, Tag)
-
-admin.site.unregister(Group)
-
-
-class RecipeIngredientAdmin(admin.StackedInline):
-    model = RecipeIngredient
-    autocomplete_fields = ('ingredient',)
-    min_num = 1
+from .models import (
+    Cart,
+    Favorite,
+    Ingredient,
+    IngredientForRecipe,
+    Recipe,
+    Tag)
 
 
-@admin.register(Recipe)
-class RecipeAdmin(admin.ModelAdmin):
-    list_display = (
-        'id', 'get_author', 'name', 'text',
-        'cooking_time', 'get_tags', 'get_ingredients', 'get_favorite_count')
-    search_fields = (
-        'name', 'cooking_time', 'tags__name',
-        'author__email', 'ingredients__name')
-    list_filter = ('tags', 'author', 'name')
-    inlines = (RecipeIngredientAdmin,)
+class IngredientsInLine(admin.TabularInline):
+    """
+    Встраиваемая панель администратора для модели Ingredients.
+    """
 
-    @admin.display(description='Автор')
-    def get_author(self, obj):
-        return obj.author.username
+    model = Recipe.ingredients.through
 
-    @admin.display(description='Теги')
-    def get_tags(self, obj):
-        return ', '.join([tag.name for tag in obj.tags.all()])
 
-    @admin.display(description='Ингредиенты')
-    def get_ingredients(self, obj):
-        return ', '.join(
-            [ingredient.name for ingredient in obj.ingredients.all()]
-        )
+class TagsInLine(admin.TabularInline):
+    """
+    Встраиваемая панель администратора для модели Tags.
+    """
 
-    @admin.display(description='Количество в избранных')
-    def get_favorite_count(self, obj):
-        return obj.favorite_recipes.count()
+    model = Recipe.tags.through
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'color', 'slug')
-    search_fields = ('name',)
+    """
+    Административный класс для модели Tag.
+    """
+
+    fields = ("name", "color", "slug")
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'measurement_unit')
-    search_fields = ('name',)
-    list_filter = ('name',)
+    """
+    Административный класс для модели Ingredient.
+    """
+
+    list_filter = ("name",)
+    list_display = ("name", "measurement_unit")
 
 
-@admin.register(FavouriteRecipe)
-class FavouriteRecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_recipe', 'date', 'get_user')
-    search_fields = ('user__email', 'recipe__name')
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    """
+    Административный класс для модели Recipe.
+    """
 
-    @admin.display(description='Email пользователя')
-    def get_user(self, obj):
-        return obj.user.email
+    list_display = ("name", "author", "count_favorite")
+    list_filter = ("name", "author", "tags")
+    inlines = (IngredientsInLine, TagsInLine)
 
-    @admin.display(description='Название рецепта')
-    def get_recipe(self, obj):
-        return obj.recipe.name
-
-    @admin.display(description='Дата создания')
-    def date(self, obj):
-        return obj.recipe.created_at
+    def count_favorite(self, instance):
+        return instance.favorites.count()
 
 
-@admin.register(ShoppingCart)
-class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_recipe', 'get_user', )
-    search_fields = ('user__email', 'recipe__name')
+@admin.register(IngredientForRecipe)
+class IngredientForRecipe(admin.ModelAdmin):
+    """
+    Административный класс для модели IngredientForRecipe.
+    """
 
-    @admin.display(description='Email пользователя')
-    def get_user(self, obj):
-        return obj.user.email
+    list_display = ("ingredient", "recipe", "amount")
 
-    @admin.display(description='Название рецепта')
-    def get_recipe(self, obj):
-        return obj.recipe.name
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.filter(user=request.user)
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    """
+    Административный класс для модели Favorite.
+    """
+
+    list_display = ("recipe", "user")
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    """
+    Административный класс для модели Cart.
+    """
+
+    list_display = ("recipe", "user")
