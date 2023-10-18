@@ -118,12 +118,13 @@ class IngredientForRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name="recipes_with_ingredient",
     )
-    amount = models.IntegerField(
+    amount = models.PositiveSmallIntegerField(
         "Количество в рецепте",
-        validators=[
-            MinValueValidator(1, "Должно быть больше 0"),
-        ],
-    )
+        default=1,
+        validators=(
+            MinValueValidator(
+                1,
+                message="Должно быть больше 0"),))
 
     class Meta:
         verbose_name = "Ингредиент в рецепте"

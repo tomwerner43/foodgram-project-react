@@ -3,6 +3,8 @@ from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (
+    Favorite,
+    Cart,
     Ingredient,
     IngredientForRecipe,
     Recipe,
@@ -253,16 +255,18 @@ class RecipeSerializer(serializers.ModelSerializer):
         return model.objects.filter(user=request.user, recipe=obj).exists()
 
     def get_is_favorited(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.favorite_recipes.filter(recipe=obj).exists()
+        user = self.context['request'].user
+        return user.is_authenticated and Favorite.objects.filter(
+            user=user,
+            recipe=obj
+        ).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.shopping_cart.filter(recipe=obj).exists()
+        user = self.context['request'].user
+        return user.is_authenticated and Cart.objects.filter(
+            user=user,
+            recipe=obj
+        ).exists()
 
 
 class RecipeAddSerializer(serializers.ModelSerializer):
