@@ -2,6 +2,9 @@ from django_filters import rest_framework as filters
 from rest_framework.exceptions import AuthenticationFailed
 
 from recipes.models import Recipe, Tag
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class RecipeFilter(filters.FilterSet):
@@ -38,3 +41,9 @@ class RecipeFilter(filters.FilterSet):
         if value:
             return queryset.filter(shopping_cart__cart_owner=self.request.user)
         return queryset
+
+    def filter_author(self, queryset, name, value):
+        return queryset.filter(author=value)
+
+    def filter_tags(self, queryset, name, value):
+        return queryset.filter(tags__in=value)
