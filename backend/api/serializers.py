@@ -215,6 +215,10 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "measurement_unit", "amount")
 
 
+class RecipeGetSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True)
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     """
     Сериализатор рецептов.
@@ -267,6 +271,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             user=user,
             recipe=obj
         ).exists()
+
+    def to_representation(self, instance):
+        serializer = RecipeGetSerializer(instance)
+        return serializer.data
 
 
 class RecipeAddSerializer(serializers.ModelSerializer):
@@ -336,3 +344,9 @@ class RecipeAddSerializer(serializers.ModelSerializer):
         self.bulk_create_ingredients(ingredients, instance)
         instance.tags.set(tags)
         return instance
+
+    def to_representation(self, instance):
+        serializer = RecipeGetSerializer(
+            instance, context={"request": self.context.get("request")}
+        )
+        return serializer.data
