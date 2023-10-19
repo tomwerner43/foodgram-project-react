@@ -26,8 +26,3 @@ urlpatterns = [
     path("", include(router.urls)),
     path("auth/", include("djoser.urls.authtoken")),
 ]
-
-router.register(r"recipes/(?P<pk>\d+)/favorite",
-                RecipeViewSet, basename="recipe-favorite")
-router.register(r"recipes/(?P<pk>\d+)/shopping-cart",
-                RecipeViewSet, basename="recipe-shopping-cart")
