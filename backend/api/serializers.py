@@ -350,3 +350,23 @@ class RecipeAddSerializer(serializers.ModelSerializer):
             instance, context={"request": self.context.get("request")}
         )
         return serializer.data
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['ingredients'] = AddIngredientSerializer(
+            instance.ingredients.all(),
+            many=True,
+        ).data
+        return data
+
+
+class FavouriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
