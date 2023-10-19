@@ -3,7 +3,7 @@ from .pagination import CustomPagination
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import Cart, Favorite, Ingredient, Recipe, Tag
+from recipes.models import Ingredient, Recipe, Tag
 from rest_framework import filters, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
