@@ -174,7 +174,6 @@ class RecipeViewSet(ModelViewSet):
         shopping_list = (
             f'Список покупок для: {user.get_full_name()}\n\n'
             f'Дата: {today:%Y-%m-%d}\n\n'
-            f'Проект foodgram, автор: Юлия Орлова\n\n'
         )
         shopping_list += '\n'.join([
             f'- {ingredient["ingredient__name"]} '
