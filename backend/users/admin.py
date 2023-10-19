@@ -1,24 +1,24 @@
-from django.conf import settings
 from django.contrib import admin
 
-from .models import Follow, User
+from users.models import Subscription, User
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    """
-    Класс модели Users.
-    """
-
-    search_fields = ("email", "first_name")
-    list_filter = ("email", "first_name")
-    empty_value_display = "-пусто-"
+    list_display = ('id', 'email', 'username', 'first_name', 'last_name')
+    search_fields = ('email', 'username', 'first_name', 'last_name')
+    list_filter = ('email', 'username')
 
 
-@admin.register(Follow)
-class FollowAdmin(admin.ModelAdmin):
-    """
-    Класс модели Follow.
-    """
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'get_subscriber', 'get_author')
+    search_fields = ('subscriber__email', 'author__email')
 
-    empty_value_display = settings.ADMIN_SITE_HEADER
+    @admin.display(description='Email подписчика')
+    def get_subscriber(self, obj):
+        return obj.subscriber.email
+
+    @admin.display(description='Email автора')
+    def get_author(self, obj):
+        return obj.author.email
