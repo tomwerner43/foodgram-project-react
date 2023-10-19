@@ -154,25 +154,31 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = self.request.user
         serializer.save(author=user)
 
-    @action(
-        detail=True, methods=("post", "delete"),
-        permission_classes=(IsAuthenticated,)
-    )
     def favorite(self, request, pk=None):
-        if request.method == "POST":
-            return self.add_recipe(Favorite, request, pk)
-        else:
-            return self.delete_recipe(Favorite, request, pk)
+        recipe = self.get_object()
+        user = request.user
 
-    @action(
-        detail=True, methods=("post", "delete"),
-        permission_classes=(IsAuthenticated,)
-    )
-    def shopping_cart(self, request, pk):
         if request.method == "POST":
-            return self.add_recipe(Cart, request, pk)
-        else:
-            return self.delete_recipe(Cart, request, pk)
+            # Добавить рецепт в избранное
+            user.favorites.add(recipe)
+            return Response(status=status.HTTP_200_OK)
+        elif request.method == "DELETE":
+            # Удалить рецепт из избранного
+            user.favorites.remove(recipe)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def shopping_cart(self, request, pk=None):
+        recipe = self.get_object()
+        user = request.user
+
+        if request.method == "POST":
+            # Добавить рецепт в корзину покупок
+            user.shopping_cart.add(recipe)
+            return Response(status=status.HTTP_200_OK)
+        elif request.method == "DELETE":
+            # Удалить рецепт из корзины покупок
+            user.shopping_cart.remove(recipe)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def add_recipe(self, model, request, pk):
