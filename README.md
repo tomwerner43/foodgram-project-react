@@ -1,5 +1,4 @@
 # praktikum_new_diplom
-http://158.160.0.201:9001/
 
 ***
 _Репозиторий на Github [ссылка](https://github.com/tomwerner43/foodgram-project-react)._
