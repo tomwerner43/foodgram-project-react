@@ -1,10 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import F
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import IntegerField, SerializerMethodField
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
@@ -159,6 +161,10 @@ class RecipeReadSerializer(ModelSerializer):
             return False
         return user.shopping_cart.filter(recipe=obj).exists()
 
+    def get_ingredients(self, obj):
+        ingredients = obj.get_total_ingredients()
+        return [{'name': ingredient['ingredient__name'], 'amount': ingredient['total_amount']} for ingredient in ingredients]
+
 
 class IngredientInRecipeWriteSerializer(ModelSerializer):
     id = IntegerField(write_only=True)
@@ -245,6 +251,22 @@ class RecipeWriteSerializer(ModelSerializer):
         request = self.context.get('request')
         context = {'request': request}
         return RecipeReadSerializer(instance, context=context).data
+
+    def validate_ingredients(self, value):
+        ingredients = value
+        ingredients_list = []
+        for item in ingredients:
+            ingredient = get_object_or_404(Ingredient, id=item['id'])
+            if ingredient in ingredients_list:
+                raise ValidationError({
+                    'ingredients': 'Ингредиенты не могут повторяться!'
+                })
+            if int(item['amount']) <= 0:
+                raise ValidationError({
+                    'amount': 'Количество ингредиента должно быть больше 0!'
+                })
+            ingredients_list.append(ingredient)
+        return value
 
 
 class RecipeBaseSerializer(ModelSerializer):
