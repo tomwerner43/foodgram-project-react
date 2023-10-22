@@ -361,10 +361,12 @@ class RecipeAddSerializer(serializers.ModelSerializer):
             ingredient = Ingredient.objects.get(id=ingredient_data['id'])
             amount = ingredient_data['amount']
 
-            recipe_ingredient, created = IngredientForRecipe.objects.get_or_create(
-                recipe=instance,
-                ingredient=ingredient,
-                defaults={'amount': amount}
+            recipe_ingredient, created = (
+                IngredientForRecipe.objects.get_or_create(
+                    recipe=instance,
+                    ingredient=ingredient,
+                    defaults={'amount': amount}
+                )
             )
 
             if not created:
