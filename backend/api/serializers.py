@@ -226,8 +226,18 @@ class RecipeWriteSerializer(ModelSerializer):
         for ingredient_data in ingredients:
             ingredient = Ingredient.objects.get(id=ingredient_data['id'])
             amount = ingredient_data['amount']
-            RecipeIngredient.objects.create(
-                recipe=instance, ingredient=ingredient, amount=amount)
+
+            # Попытка получить существующий RecipeIngredient для данного ингредиента и рецепта
+            recipe_ingredient, created = RecipeIngredient.objects.get_or_create(
+                recipe=instance,
+                ingredient=ingredient,
+                defaults={'amount': amount}
+            )
+
+            if not created:
+                # Если RecipeIngredient уже существует, увеличьте значение
+                recipe_ingredient.amount = F('amount') + amount
+                recipe_ingredient.save()
 
         return instance
 
