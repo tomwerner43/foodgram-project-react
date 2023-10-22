@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import F
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from recipes.models import (
@@ -327,22 +328,49 @@ class RecipeAddSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        ingredients = validated_data.pop("ingredient_in_recipe")
-        tags = validated_data.pop("tags")
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+
         recipe = Recipe.objects.create(**validated_data)
-        self.bulk_create_ingredients(ingredients, recipe)
         recipe.tags.set(tags)
-        recipe.save()
+
+        for ingredient_data in ingredients:
+            ingredient = Ingredient.objects.get(id=ingredient_data['id'])
+            amount = ingredient_data['amount']
+            existing_recipe_ingredient = IngredientForRecipe.objects.filter(
+                recipe=recipe, ingredient=ingredient).first()
+            if existing_recipe_ingredient:
+                existing_recipe_ingredient.amount += amount
+                existing_recipe_ingredient.save()
+            else:
+                IngredientForRecipe.objects.create(
+                    recipe=recipe, ingredient=ingredient, amount=amount)
+
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop("ingredient_in_recipe")
-        tags = validated_data.pop("tags")
-        IngredientForRecipe.objects.filter(recipe=instance).delete()
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
         instance = super().update(instance, validated_data)
-        self.bulk_create_ingredients(ingredients, instance)
+        instance.tags.clear()
         instance.tags.set(tags)
+
+        IngredientForRecipe.objects.filter(recipe=instance).delete()
+        for ingredient_data in ingredients:
+            ingredient = Ingredient.objects.get(id=ingredient_data['id'])
+            amount = ingredient_data['amount']
+
+            recipe_ingredient, created = IngredientForRecipe.objects.get_or_create(
+                recipe=instance,
+                ingredient=ingredient,
+                defaults={'amount': amount}
+            )
+
+            if not created:
+                recipe_ingredient.amount = F('amount') + amount
+                recipe_ingredient.save()
+
         return instance
 
     def to_representation(self, instance):
