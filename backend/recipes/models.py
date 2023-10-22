@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Sum
 from django.core.validators import MinValueValidator, RegexValidator
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -96,9 +95,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_total_ingredients(self):
-        return self.recipe_ingredients.values('ingredient__name').annotate(total_amount=Sum('amount'))
 
 
 class RecipeIngredient(models.Model):
