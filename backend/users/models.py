@@ -3,39 +3,52 @@ from django.db import models
 
 
 class User(AbstractUser):
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+    """
+    Класс представляет пользователей приложения.
+    """
 
-    email = models.EmailField(unique=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username", "first_name", "last_name", "password"]
+
+    email = models.EmailField("email", unique=True, max_length=254)
+
+    first_name = models.CharField(("first name"), max_length=150, blank=False)
+    last_name = models.CharField(("last name"), max_length=150, blank=False)
 
     class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-        ordering = ('id',)
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
 
     def __str__(self):
-        return self.email
+        return self.username
 
 
-class Subscription(models.Model):
+class Follow(models.Model):
+    """
+    Класс представляет отношение между пользователями,
+    где одни пользователи могут подписываться на других.
+    """
+
+    user = models.ForeignKey(
+        User,
+        verbose_name="Пользователь",
+        on_delete=models.CASCADE,
+        related_name="follower",
+    )
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE,
-        related_name='following',
-        verbose_name='Автор')
-    subscriber = models.ForeignKey(
-        User, on_delete=models.CASCADE,
-        related_name='followers',
-        verbose_name='Подписчик')
+        User,
+        verbose_name="Автор",
+        on_delete=models.CASCADE,
+        related_name="following",
+    )
 
     class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
-        ordering = ('-id',)
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'subscriber'],
-                name='unique_subscription')
+                fields=["user", "author"], name="unique_following")
         ]
 
     def __str__(self):
-        return f'{self.subscriber} подписан на {self.author}'
+        return f'{self.user.username} подписан на {self.author.username}'

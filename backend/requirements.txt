@@ -9,7 +9,6 @@ cryptography==40.0.2
 defusedxml==0.7.1
 Django==3.2.3
 django-extra-fields==3.0.2
-django-cleanup==6.0.0
 django-filter==23.2
 django-rest-framework==0.1.0
 django-templated-mail==1.1.1
