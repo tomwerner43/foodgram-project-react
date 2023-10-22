@@ -3,52 +3,39 @@ from django.db import models
 
 
 class User(AbstractUser):
-    """
-    Класс представляет пользователей приложения.
-    """
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username", "first_name", "last_name", "password"]
-
-    email = models.EmailField("email", unique=True, max_length=254)
-
-    first_name = models.CharField(("first name"), max_length=150, blank=False)
-    last_name = models.CharField(("last name"), max_length=150, blank=False)
+    email = models.EmailField(unique=True)
 
     class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ('id',)
 
     def __str__(self):
-        return self.username
+        return self.email
 
 
-class Follow(models.Model):
-    """
-    Класс представляет отношение между пользователями,
-    где одни пользователи могут подписываться на других.
-    """
-
-    user = models.ForeignKey(
-        User,
-        verbose_name="Пользователь",
-        on_delete=models.CASCADE,
-        related_name="follower",
-    )
+class Subscription(models.Model):
     author = models.ForeignKey(
-        User,
-        verbose_name="Автор",
-        on_delete=models.CASCADE,
-        related_name="following",
-    )
+        User, on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Автор')
+    subscriber = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='followers',
+        verbose_name='Подписчик')
 
     class Meta:
-        verbose_name = "Подписка"
-        verbose_name_plural = "Подписки"
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        ordering = ('-id',)
         constraints = [
             models.UniqueConstraint(
-                fields=["user", "author"], name="unique_following")
+                fields=['author', 'subscriber'],
+                name='unique_subscription')
         ]
 
     def __str__(self):
-        return f'{self.user.username} подписан на {self.author.username}'
+        return f'{self.subscriber} подписан на {self.author}'
